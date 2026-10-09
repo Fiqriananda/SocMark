@@ -4,7 +4,7 @@ SocMark is a web application project combining social networking and creator mar
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 SocMark/
@@ -18,7 +18,7 @@ SocMark/
 
 ---
 
-## 📄 Page Breakdown & Semantic HTML Hierarchy
+## Page Breakdown & Semantic HTML Hierarchy
 
 ### 1. `login.html` — Sign In Page
 
@@ -204,7 +204,7 @@ The profile page uses semantic HTML5 container elements (`<header>`, `<nav>`, `<
 
 ---
 
-## 🏷️ HTML5 Semantic Elements Employed
+## HTML5 Semantic Elements Employed
 
 | Semantic Tag | Usage in Project |
 | :--- | :--- |
