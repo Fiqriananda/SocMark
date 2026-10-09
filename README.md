@@ -223,7 +223,7 @@ The profile page uses semantic HTML5 container elements (`<header>`, `<nav>`, `<
 ## Screenshot
 ### Profile
 <img width="1470" height="839" alt="image" src="https://github.com/user-attachments/assets/d5d36853-af3c-47e6-8bed-d9a52e7165b0" />
-![Uploading image.png…]()
+<img width="1470" height="956" alt="image" src="https://github.com/user-attachments/assets/59fc61ea-9d3d-49e1-97e5-c0fba3049116" />
 
 
 ### Login 
@@ -232,6 +232,7 @@ The profile page uses semantic HTML5 container elements (`<header>`, `<nav>`, `<
 
 ### Register
 <img width="1470" height="842" alt="image" src="https://github.com/user-attachments/assets/d34848b0-5d48-458b-8cba-de84f45282ba" />
-![Uploading image.png…]()
+<img width="1470" height="956" alt="image" src="https://github.com/user-attachments/assets/1451cb47-7921-4b15-af10-d7d9846bb3ca" />
+
 
 
