@@ -8,21 +8,46 @@
         content="Jelajahi posting dari komunitas SocMark — temukan barang menarik, suka dan tinggalkan komentar.">
     <title>Feed | SocMark</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
-<body>
-    <header class="product-navbar">
-        <a class="product-brand" href="feed.html" aria-label="SocMark beranda">
-            <span class="product-brand-mark">S</span>
-            <span>SocMark</span>
-        </a>
-        <span class="product-nav-label">Social Market</span>
+<body class="feed-page-body">
+    <!-- Top Navigation Bar -->
+    <header class="app-navbar">
+        <nav>
+            <a href="feed.html" class="app-nav-brand">
+                <div class="brand-logo-small">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="3" rx="5"/>
+                        <circle cx="8.5" cy="9.5" r="1.5" fill="currentColor"/>
+                        <circle cx="15.5" cy="9.5" r="1.5" fill="currentColor"/>
+                        <path d="M8.5 14.5c1 1.5 2.5 2 3.5 2s2.5-.5 3.5-2"/>
+                    </svg>
+                </div>
+                <span>SocMark</span>
+            </a>
+            <ul class="app-nav-links">
+                <li><a href="feed.html" class="active">Feed</a></li>
+                <li><a href="discover.html">Discover</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="login.html">Sign In</a></li>
+                <li><a href="register.html">Sign Up</a></li>
+            </ul>
+        </nav>
     </header>
 
+    <!-- Main Content Container -->
     <main class="product-page">
         <div class="product-page-heading">
-            <p class="product-eyebrow">TERBARU DARI KOMUNITAS</p>
-            <h1>Posting hari ini</h1>
+            <div class="feed-header-badge">
+                <span class="feed-badge-pulse" aria-hidden="true"></span>
+                <span>Komunitas & Tren Terkini</span>
+            </div>
+            <h1>Explore Community Feed</h1>
+            <p class="feed-page-subtitle">Temukan inspirasi produk pilihan, koleksi kurasi, dan interaksi langsung dengan kreator di SocMark.</p>
         </div>
 
         <!-- Filter Pill Bar -->
@@ -50,6 +75,11 @@
             <div class="product-modal-inner" id="product-modal-inner"></div>
         </div>
     </div>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+        <p>© 2026 SocMark. The Social Marketplace for Creators and Curators.</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
