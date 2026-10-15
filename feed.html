@@ -1,29 +1,57 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Temukan detail produk pilihan di SocMark.">
-    <title>Produk | SocMark</title>
+    <meta name="description"
+        content="Jelajahi posting dari komunitas SocMark — temukan barang menarik, suka dan tinggalkan komentar.">
+    <title>Feed | SocMark</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header class="product-navbar">
         <a class="product-brand" href="feed.html" aria-label="SocMark beranda">
             <span class="product-brand-mark">S</span>
             <span>SocMark</span>
         </a>
-        <span class="product-nav-label">Marketplace</span>
+        <span class="product-nav-label">Social Market</span>
     </header>
+
     <main class="product-page">
         <div class="product-page-heading">
-            <p class="product-eyebrow">PILIHAN HARI INI</p>
-            <h1>Produk pilihan</h1>
+            <p class="product-eyebrow">TERBARU DARI KOMUNITAS</p>
+            <h1>Posting hari ini</h1>
         </div>
+
+        <!-- Filter Pill Bar -->
+        <div class="feed-filter-bar" id="feed-filter-bar" role="tablist" aria-label="Filter kategori">
+            <button class="feed-filter-pill active" data-category="all" role="tab" aria-selected="true">Semua</button>
+        </div>
+
+        <!-- Masonry Grid -->
         <section id="product-container" class="product-container" aria-live="polite" aria-busy="true">
-            <p class="product-state">Memuat produk...</p>
+            <p class="product-state">Memuat posting…</p>
         </section>
     </main>
+
+    <!-- Post Detail Modal -->
+    <div class="product-modal-overlay" id="product-modal-overlay" role="dialog" aria-modal="true"
+        aria-label="Detail posting" hidden>
+        <div class="product-modal-card" id="product-modal-card">
+            <button class="product-modal-close" id="product-modal-close" aria-label="Tutup detail posting">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+            <div class="product-modal-inner" id="product-modal-inner"></div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
+
 </html>
