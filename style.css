@@ -1503,6 +1503,63 @@ textarea:focus {
   border-color: #d1d5db;
 }
 
+/* Curated Collection Lookbook Visual Cover */
+.collection-cover-wrapper {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background-color: #f1f5f9;
+}
+
+.collection-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.curated-collection-card:hover .collection-cover-img {
+  transform: scale(1.03);
+}
+
+.collection-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: #ea580c;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+.collection-overlay-info {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  pointer-events: none;
+}
+
+.collection-items-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: rgba(17, 24, 39, 0.88);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
 .card-author-header {
   display: flex;
   justify-content: space-between;
@@ -1589,7 +1646,7 @@ textarea:focus {
   color: #4b5563;
   font-size: 0.875rem;
   line-height: 1.55;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
 /* ═══════════════════════════════════════════════
@@ -2064,7 +2121,7 @@ textarea:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
 }
 
 .post-tag-chip {
@@ -2089,6 +2146,91 @@ textarea:focus {
   background-color: #111827;
   color: #ffffff;
   border-color: #111827;
+}
+
+/* Featured Products Strip in Post Card */
+.collection-products-strip {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  margin: 0.25rem 0 1rem;
+}
+
+.strip-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.strip-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.strip-product-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.strip-product-chip:hover {
+  border-color: #111827;
+  background-color: #ffffff;
+}
+
+.chip-thumb {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.chip-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.chip-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+
+.chip-price {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ea580c;
+}
+
+.chip-feed-tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 /* Discover Card Footer */
@@ -2403,11 +2545,29 @@ textarea:focus {
   overflow-y: auto;
 }
 
+/* Modal Lookbook Banner Cover */
+.modal-lookbook-banner-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  background-color: #f1f5f9;
+}
+
+.modal-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .modal-tags-row {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .modal-tag-chip {
@@ -2424,16 +2584,194 @@ textarea:focus {
   font-size: 1.5rem;
   font-weight: 800;
   color: #111827;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.35rem;
   line-height: 1.3;
 }
 
+.modal-story-subtitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ea580c;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
 .modal-content-text {
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.7;
   color: #374151;
   margin-bottom: 1.75rem;
   white-space: pre-line;
+}
+
+/* Modal Shoppable Products Section */
+.modal-products-section {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.modal-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.modal-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.modal-section-title-wrap h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.modal-products-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.modal-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.875rem;
+}
+
+.modal-product-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal-product-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.modal-product-thumb-wrap {
+  position: relative;
+  width: 100%;
+  height: 135px;
+  background-color: #f1f5f9;
+}
+
+.modal-product-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-product-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #111827;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.modal-product-details {
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.modal-product-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.modal-product-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.modal-product-price {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #ea580c;
+  white-space: nowrap;
+}
+
+.modal-product-creator {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.85rem;
+}
+
+.modal-product-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.btn-product-feed {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-product-feed:hover {
+  background-color: #f3f4f6;
+  border-color: #111827;
+}
+
+.btn-product-buy {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background-color: #111827;
+  border: 1px solid #111827;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-product-buy:hover {
+  background-color: #1f2937;
 }
 
 .modal-metrics-card {

@@ -83,6 +83,55 @@ $(document).ready(function() {
     }
   ];
 
+  // Featured Marketplace Products from Feed (profile.html)
+  const FEED_PRODUCTS = [
+    {
+      id: 1,
+      title: "Wildflower Masterclass & Presets",
+      creator: "Johnathan Clein",
+      price: "$24.00",
+      image: "images/post-1.jpg",
+      link: "profile.html#post-card-1",
+      category: "Presets"
+    },
+    {
+      id: 2,
+      title: "Streetwear Essential Hoodie",
+      creator: "Urban Vibe Studio",
+      price: "$45.00",
+      image: "images/post-2.jpg",
+      link: "profile.html#post-card-2",
+      category: "Apparel"
+    },
+    {
+      id: 3,
+      title: "Urban Vibe Lookbook & LUTs",
+      creator: "Johnathan Clein",
+      price: "$19.00",
+      image: "images/post-3.jpg",
+      link: "profile.html#post-card-3",
+      category: "Color Grade"
+    },
+    {
+      id: 4,
+      title: "Rooftop Golden Hour Session",
+      creator: "Sunset Archive",
+      price: "$35.00",
+      image: "images/post-4.jpg",
+      link: "profile.html#post-card-4",
+      category: "Asset Bundle"
+    }
+  ];
+
+  // Visual Lookbook Covers from SocMark Feed
+  const LOOKBOOK_COVERS = [
+    "images/post-2.jpg",
+    "images/post-3.jpg",
+    "images/post-4.jpg",
+    "images/post-1.jpg",
+    "images/cover.jpg"
+  ];
+
   // DOM Elements Cache
   const $searchBar = $('#discover-search-input');
   const $clearSearchBtn = $('#clear-search-btn');
@@ -108,11 +157,14 @@ $(document).ready(function() {
   const $modalCloseBtn = $('#modal-close-btn');
   const $modalDoneBtn = $('#modal-done-btn');
   const $modalShareBtn = $('#modal-share-btn');
+  const $modalCoverImg = $('#modal-cover-img');
+  const $modalLookbookBadge = $('#modal-lookbook-badge');
   const $modalAuthorAvatar = $('#modal-author-avatar');
   const $modalAuthorName = $('#modal-author-name');
   const $modalAuthorMeta = $('#modal-author-meta');
   const $modalTitle = $('#modal-story-title');
   const $modalBody = $('#modal-story-body');
+  const $modalProductsList = $('#modal-products-list');
   const $modalTags = $('#modal-tags');
   const $modalLikesCount = $('#modal-likes-count');
   const $modalDislikesCount = $('#modal-dislikes-count');
@@ -133,6 +185,17 @@ $(document).ready(function() {
     ];
     const index = Math.abs((userId || 1) % solidColors.length);
     return solidColors[index];
+  }
+
+  function getLinkedProducts(postId) {
+    const idx1 = Math.abs((postId || 1) % FEED_PRODUCTS.length);
+    const idx2 = (idx1 + 1) % FEED_PRODUCTS.length;
+    return [FEED_PRODUCTS[idx1], FEED_PRODUCTS[idx2]];
+  }
+
+  function getLookbookCover(postId) {
+    const idx = Math.abs((postId || 1) % LOOKBOOK_COVERS.length);
+    return LOOKBOOK_COVERS[idx];
   }
 
   /**
@@ -422,7 +485,7 @@ $(document).ready(function() {
   }
 
   /**
-   * Create HTML Element for a single post card
+   * Create HTML Element for a Curated Collection Lookbook card
    */
   function createPostCardElement(post) {
     const likes = (post.reactions && typeof post.reactions.likes === 'number') ? post.reactions.likes : 0;
@@ -431,6 +494,8 @@ $(document).ready(function() {
     const userId = post.userId || 1;
     const readTime = estimateReadTime(post.body);
     const avatarBgColor = getAuthorAvatarStyle(userId);
+    const lookbookCover = getLookbookCover(post.id);
+    const linkedProducts = getLinkedProducts(post.id);
     const isLiked = STATE.userLikes.has(post.id);
     const isDisliked = STATE.userDislikes.has(post.id);
     const isSaved = STATE.userBookmarks.has(post.id);
@@ -452,9 +517,45 @@ $(document).ready(function() {
       });
     }
 
+    // Render Shoppable Product preview chips from feed
+    let productsStripHtml = '';
+    linkedProducts.forEach(prod => {
+      productsStripHtml += `
+        <a href="${prod.link}" class="strip-product-chip" title="View ${escapeHtml(prod.title)} in Feed">
+          <img src="${prod.image}" alt="${escapeHtml(prod.title)}" class="chip-thumb">
+          <div class="chip-info">
+            <span class="chip-title">${escapeHtml(prod.title)}</span>
+            <span class="chip-price">${escapeHtml(prod.price)}</span>
+          </div>
+          <span class="chip-feed-tag">In Feed</span>
+        </a>
+      `;
+    });
+
     const cardHtml = `
-      <article class="feed-card discover-post-card" id="post-card-${post.id}" data-id="${post.id}">
-        <!-- Author & Marketplace Header -->
+      <article class="feed-card discover-post-card curated-collection-card" id="post-card-${post.id}" data-id="${post.id}">
+        <!-- Visual Media Header (Lookbook Cover) -->
+        <div class="card-media-wrapper collection-cover-wrapper">
+          <img 
+            src="${lookbookCover}" 
+            alt="Lookbook editorial for ${escapeHtml(post.title)}" 
+            class="card-image collection-cover-img"
+            loading="lazy"
+          >
+          <span class="badge-premium collection-badge">Curated Lookbook</span>
+          <div class="collection-overlay-info">
+            <span class="collection-items-pill">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              <span>Shop Look (${linkedProducts.length} Items)</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Creator & Marketplace Row -->
         <div class="card-author-header">
           <div class="author-meta-left">
             <div class="author-avatar" style="background-color: ${avatarBgColor};">
@@ -474,11 +575,11 @@ $(document).ready(function() {
             </div>
           </div>
           <div class="card-header-badge">
-            <span class="tag-accent-badge">#${post.tags && post.tags[0] ? escapeHtml(post.tags[0]) : 'story'}</span>
+            <span class="tag-accent-badge">#${post.tags && post.tags[0] ? escapeHtml(post.tags[0]) : 'lookbook'}</span>
           </div>
         </div>
 
-        <!-- Post Content -->
+        <!-- Collection Story & Trend Content -->
         <div class="card-content">
           <div class="card-header-row">
             <h2 class="card-title discover-card-title" title="${escapeHtml(post.title)}">
@@ -487,12 +588,27 @@ $(document).ready(function() {
           </div>
 
           <p class="card-excerpt discover-excerpt">
-            ${escapeHtml(truncateText(post.body, 160))}
+            ${escapeHtml(truncateText(post.body, 145))}
           </p>
 
           <!-- Tags row -->
           <div class="post-tags-row">
             ${tagsHtml}
+          </div>
+
+          <!-- Featured Marketplace Products Strip from Feed -->
+          <div class="collection-products-strip">
+            <div class="strip-header">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              <span>Featured Items in this Lookbook:</span>
+            </div>
+            <div class="strip-items-list">
+              ${productsStripHtml}
+            </div>
           </div>
 
           <!-- Bottom Footer Metrics with interactive Likes, Dislikes, Views, Save -->
@@ -503,8 +619,8 @@ $(document).ready(function() {
                 type="button" 
                 class="card-metric-btn like-btn ${isLiked ? 'active' : ''}" 
                 data-id="${post.id}" 
-                aria-label="Like story"
-                title="Like story"
+                aria-label="Like lookbook"
+                title="Like lookbook"
               >
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="${isLiked ? '#ef4444' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -517,8 +633,8 @@ $(document).ready(function() {
                 type="button" 
                 class="card-metric-btn dislike-btn ${isDisliked ? 'active' : ''}" 
                 data-id="${post.id}" 
-                aria-label="Dislike story"
-                title="Dislike story"
+                aria-label="Dislike lookbook"
+                title="Dislike lookbook"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="${isDisliked ? '#64748b' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/>
@@ -542,22 +658,22 @@ $(document).ready(function() {
                 type="button" 
                 class="card-metric-btn save-btn ${isSaved ? 'active' : ''}" 
                 data-id="${post.id}" 
-                aria-label="Save story"
-                title="Save story"
+                aria-label="Save collection"
+                title="Save collection"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="${isSaved ? '#0f172a' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
                 </svg>
               </button>
 
-              <!-- Read story modal button -->
+              <!-- Explore Lookbook button -->
               <button 
                 type="button" 
                 class="card-read-more-btn" 
                 data-id="${post.id}"
-                title="Open story details"
+                title="Explore lookbook & shop products"
               >
-                <span>Read</span>
+                <span>Shop Look</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/>
                   <polyline points="12 5 19 12 12 19"/>
@@ -573,7 +689,7 @@ $(document).ready(function() {
   }
 
   /**
-   * Open full modal for a post
+   * Open full modal for a Curated Collection Lookbook
    */
   function openStoryModal(postId) {
     const post = STATE.posts.find(p => p.id === postId);
@@ -587,7 +703,13 @@ $(document).ready(function() {
     const readTime = estimateReadTime(post.body);
     const isLiked = STATE.userLikes.has(post.id);
     const isDisliked = STATE.userDislikes.has(post.id);
+    const lookbookCover = getLookbookCover(post.id);
+    const linkedProducts = getLinkedProducts(post.id);
 
+    // Update modal banner image
+    $modalCoverImg.attr('src', lookbookCover).attr('alt', post.title);
+
+    // Author info
     $modalAuthorAvatar.text(`U${userId}`).css('background-color', getAuthorAvatarStyle(userId));
     $modalAuthorName.text(`Creator #${userId}`);
     $modalAuthorMeta.text(`@creator_${userId} • Post #${post.id} • ${readTime}`);
@@ -596,6 +718,43 @@ $(document).ready(function() {
     $modalLikesCount.text(isLiked ? likes + 1 : likes);
     $modalDislikesCount.text(isDisliked ? dislikes + 1 : dislikes);
     $modalViewsCount.text(views);
+
+    // Render linked feed products inside modal
+    let productsModalHtml = '';
+    linkedProducts.forEach(prod => {
+      productsModalHtml += `
+        <div class="modal-product-card">
+          <div class="modal-product-thumb-wrap">
+            <img src="${prod.image}" alt="${escapeHtml(prod.title)}" class="modal-product-thumb">
+            <span class="modal-product-badge">${escapeHtml(prod.category)}</span>
+          </div>
+          <div class="modal-product-details">
+            <div class="modal-product-title-row">
+              <h4 class="modal-product-title">${escapeHtml(prod.title)}</h4>
+              <span class="modal-product-price">${escapeHtml(prod.price)}</span>
+            </div>
+            <p class="modal-product-creator">Featured in creator feed by ${escapeHtml(prod.creator)}</p>
+            <div class="modal-product-actions">
+              <a href="${prod.link}" class="btn-product-feed" title="View product in creator profile feed">
+                <span>View in Feed</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/>
+                </svg>
+              </a>
+              <button type="button" class="btn-product-buy" data-title="${escapeHtml(prod.title)}">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                  <path d="M3 6h18"/>
+                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+                <span>Add to Bag</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    $modalProductsList.html(productsModalHtml);
 
     // Tags in modal
     let tagsHtml = '';
@@ -803,10 +962,18 @@ $(document).ready(function() {
   $modalShareBtn.on('click', function() {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
-      showToast('Story URL copied to clipboard!', 'success');
+      showToast('Collection URL copied to clipboard!', 'success');
     } else {
-      showToast('Story URL ready to share', 'info');
+      showToast('Collection link ready to share', 'info');
     }
+  });
+
+  // Quick buy / Add to bag from lookbook modal
+  $(document).on('click', '.btn-product-buy', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const itemTitle = $(this).data('title');
+    showToast(`Added "${itemTitle}" to your collection bag!`, 'success');
   });
 
   // Reset filter button
