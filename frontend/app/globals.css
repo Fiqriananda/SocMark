@@ -1,7 +1,0 @@
-@import "tailwindcss";
-@import "./socmark.css";
-
-/* Next.js Root adjustments */
-html, body {
-  min-height: 100%;
-}
