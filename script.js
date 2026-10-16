@@ -1,3 +1,4 @@
+if (document.getElementById('product-container')) {
 /* ───────── helpers ───────── */
 function escapeHtml(v) {
   return String(v).replace(/[&<>"']/g, c =>
@@ -495,3 +496,259 @@ fetch('https://dummyjson.com/products?limit=50')
     productContainer.innerHTML = '<p class="product-state product-error">Gagal memuat posting. Periksa koneksi lalu muat ulang.</p>';
     productContainer.setAttribute('aria-busy', 'false');
   });
+}
+
+if (document.getElementById('user-tbody')) {
+  const COLORS = ['#52705f', '#c65b83', '#c28b35', '#43815a', '#3385a5', '#8060a8', '#b64a3b', '#3f8d83'];
+  const users = [
+    { id: 'USR001', name: 'Grace Nakamura', username: 'gracemark', email: 'grace@socmark.id', role: 'admin', status: 'active', apiKey: genKey(), color: '#52705f' },
+    { id: 'USR002', name: 'Bima Santoso', username: 'bimasnt', email: 'bima@socmark.id', role: 'reseller', status: 'active', apiKey: genKey(), color: '#c28b35' },
+    { id: 'USR003', name: 'Laila Putri', username: 'laila_p', email: 'laila@socmark.id', role: 'member', status: 'active', apiKey: genKey(), color: '#43815a' },
+    { id: 'USR004', name: 'Dimas Arief', username: 'dimasarief', email: 'dimas@socmark.id', role: 'reseller', status: 'inactive', apiKey: genKey(), color: '#3385a5' },
+    { id: 'USR005', name: 'Sari Wulandari', username: 'sariwulan', email: 'sari@socmark.id', role: 'member', status: 'active', apiKey: genKey(), color: '#c65b83' },
+    { id: 'USR006', name: 'Reza Firmansyah', username: 'rezafirman', email: 'reza@socmark.id', role: 'admin', status: 'active', apiKey: genKey(), color: '#8060a8' },
+    { id: 'USR007', name: 'Nadia Kusuma', username: 'nadiakusuma', email: 'nadia@socmark.id', role: 'member', status: 'inactive', apiKey: genKey(), color: '#b64a3b' },
+    { id: 'USR008', name: 'Fajar Nugroho', username: 'fajarnug', email: 'fajar@socmark.id', role: 'reseller', status: 'active', apiKey: genKey(), color: '#3f8d83' },
+    { id: 'USR009', name: 'Citra Ayu', username: 'citraayu', email: 'citra@socmark.id', role: 'member', status: 'active', apiKey: genKey(), color: '#c28b35' },
+    { id: 'USR010', name: 'Hendra Wijaya', username: 'hendrawj', email: 'hendra@socmark.id', role: 'reseller', status: 'active', apiKey: genKey(), color: '#52705f' },
+    { id: 'USR011', name: 'Putri Rahayu', username: 'putrirahay', email: 'putri@socmark.id', role: 'member', status: 'inactive', apiKey: genKey(), color: '#43815a' },
+    { id: 'USR012', name: 'Andi Prasetyo', username: 'andipras', email: 'andi@socmark.id', role: 'admin', status: 'active', apiKey: genKey(), color: '#c65b83' },
+  ];
+
+  let nextId = 13;
+  let editId = null;
+  let deleteTargetId = null;
+  let toastTimer = null;
+
+  const tbody = document.getElementById('user-tbody');
+  const formModal = document.getElementById('form-modal');
+  const deleteModal = document.getElementById('delete-modal');
+  const fName = document.getElementById('f-name');
+  const fUsername = document.getElementById('f-username');
+  const fEmail = document.getElementById('f-email');
+  const fRole = document.getElementById('f-role');
+  const fStatus = document.getElementById('f-status');
+  const modalTitle = document.getElementById('form-modal-title');
+  const formSaveBtn = document.getElementById('form-save-btn');
+
+  function genKey() {
+    return `sk_${Array.from({ length: 28 }, () => Math.random().toString(36)[2]).join('')}`;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    })[character]);
+  }
+
+  function initials(name) {
+    return name.split(/\s+/).filter(Boolean).map(word => word[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('opacity-0', 'translate-y-3', 'border-[#dce4dc]', 'border-[#e6b8b0]');
+    toast.classList.add('opacity-100', 'translate-y-0');
+    toast.classList.add(type === 'danger' ? 'border-[#e6b8b0]' : 'border-[#dce4dc]');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('opacity-100', 'translate-y-0');
+      toast.classList.add('opacity-0', 'translate-y-3');
+    }, 2800);
+  }
+
+  function updateStats() {
+    document.getElementById('stat-total').textContent = users.length;
+    document.getElementById('stat-admin').textContent = users.filter(user => user.role === 'admin').length;
+    document.getElementById('stat-reseller').textContent = users.filter(user => user.role === 'reseller').length;
+    document.getElementById('stat-member').textContent = users.filter(user => user.role === 'member').length;
+    document.getElementById('total-badge').textContent = `${users.length} pengguna`;
+  }
+
+  function render() {
+    const query = document.getElementById('search-input').value.trim().toLowerCase();
+    const role = document.getElementById('role-filter').value;
+    const status = document.getElementById('status-filter').value;
+    const filteredUsers = users.filter(user => {
+      const matchesQuery = !query || [user.name, user.username, user.email]
+        .some(value => value.toLowerCase().includes(query));
+      return matchesQuery && (!role || user.role === role) && (!status || user.status === status);
+    });
+
+    if (!filteredUsers.length) {
+      tbody.innerHTML = '<tr><td class="px-5 py-12 text-center text-sm text-[#69736c]" colspan="8">Tidak ada pengguna yang cocok.</td></tr>';
+    } else {
+      tbody.innerHTML = filteredUsers.map(user => {
+        const safeId = escapeHtml(user.id);
+        const safeName = escapeHtml(user.name);
+        const safeUsername = escapeHtml(user.username);
+        const safeEmail = escapeHtml(user.email);
+        const safeKey = escapeHtml(user.apiKey);
+        const roleClasses = user.role === 'admin'
+          ? 'bg-[#edf1e9] text-[#355744]'
+          : user.role === 'reseller'
+            ? 'bg-[#fbf2df] text-[#946019]'
+            : 'bg-[#f1f3f0] text-[#59645d]';
+        const statusClasses = user.status === 'active'
+          ? 'bg-[#e8f3ec] text-[#34724b]'
+          : 'bg-[#f1f3f0] text-[#69736c]';
+
+        return `<tr class="transition hover:bg-[#fafbf9]">
+          <td class="whitespace-nowrap px-5 py-4 font-mono text-xs text-[#8a938d]">${safeId}</td>
+          <td class="px-5 py-4">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-bold text-white" style="background-color:${user.color}">${escapeHtml(initials(user.name))}</span>
+              <span class="whitespace-nowrap font-semibold text-[#18231e]">${safeName}</span>
+            </div>
+          </td>
+          <td class="whitespace-nowrap px-5 py-4 text-[#69736c]">@${safeUsername}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-[#69736c]">${safeEmail}</td>
+          <td class="px-5 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${roleClasses}">${escapeHtml(user.role)}</span></td>
+          <td class="px-5 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-semibold ${statusClasses}">${user.status === 'active' ? 'Aktif' : 'Nonaktif'}</span></td>
+          <td class="px-5 py-4">
+            <div class="flex items-center gap-1.5">
+              <span class="max-w-28 truncate font-mono text-xs text-[#69736c]" title="${safeKey}">${safeKey}</span>
+              <button class="rounded-md p-1.5 text-[#8a938d] transition hover:bg-[#edf1e9] hover:text-[#355744]" type="button" data-action="copy" data-user-id="${safeId}" aria-label="Salin API key ${safeId}" title="Salin API key">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+              </button>
+              <button class="rounded-md p-1.5 text-[#8a938d] transition hover:bg-[#edf1e9] hover:text-[#355744]" type="button" data-action="regenerate" data-user-id="${safeId}" aria-label="Buat ulang API key ${safeId}" title="Buat ulang API key">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 7h-5V2"/><path d="M4 17h5v5"/><path d="M5.6 9a7 7 0 0 1 11.6-2L20 9M4 15l2.8 2a7 7 0 0 0 11.6-2"/></svg>
+              </button>
+            </div>
+          </td>
+          <td class="px-5 py-4">
+            <div class="flex items-center gap-2">
+              <button class="rounded-lg border border-[#dce4dc] px-2.5 py-1.5 text-xs font-semibold text-[#355744] transition hover:bg-[#edf1e9]" type="button" data-action="edit" data-user-id="${safeId}">Ubah</button>
+              <button class="rounded-lg border border-[#efd5d0] px-2.5 py-1.5 text-xs font-semibold text-[#a43f32] transition hover:bg-[#fbefec]" type="button" data-action="delete" data-user-id="${safeId}">Hapus</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('showing-label').textContent =
+      `Menampilkan ${filteredUsers.length} dari ${users.length} pengguna`;
+    updateStats();
+  }
+
+  function openFormModal(user = null) {
+    editId = user ? user.id : null;
+    modalTitle.textContent = user ? 'Ubah pengguna' : 'Tambah pengguna';
+    formSaveBtn.textContent = user ? 'Simpan perubahan' : 'Simpan pengguna';
+    fName.value = user ? user.name : '';
+    fUsername.value = user ? user.username : '';
+    fEmail.value = user ? user.email : '';
+    fRole.value = user ? user.role : 'member';
+    fStatus.value = user ? user.status : 'active';
+    formModal.classList.remove('hidden');
+    fName.focus();
+  }
+
+  function closeFormModal() {
+    formModal.classList.add('hidden');
+  }
+
+  function closeDeleteModal() {
+    deleteModal.classList.add('hidden');
+    deleteTargetId = null;
+  }
+
+  document.getElementById('add-user-btn').addEventListener('click', () => openFormModal());
+  document.getElementById('form-modal-close').addEventListener('click', closeFormModal);
+  document.getElementById('form-cancel-btn').addEventListener('click', closeFormModal);
+  formModal.addEventListener('click', event => {
+    if (event.target === formModal) closeFormModal();
+  });
+
+  formSaveBtn.addEventListener('click', () => {
+    const name = fName.value.trim();
+    const username = fUsername.value.trim();
+    const email = fEmail.value.trim();
+    if (!name || !username || !email) {
+      showToast('Lengkapi nama, username, dan email terlebih dahulu.', 'danger');
+      return;
+    }
+
+    if (editId) {
+      const user = users.find(item => item.id === editId);
+      if (!user) {
+        showToast('Pengguna tidak ditemukan. Muat ulang halaman dan coba lagi.', 'danger');
+        return;
+      }
+      Object.assign(user, { name, username, email, role: fRole.value, status: fStatus.value });
+      showToast('Data pengguna berhasil diperbarui.');
+    } else {
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      users.push({
+        id: `USR${String(nextId).padStart(3, '0')}`,
+        name,
+        username,
+        email,
+        role: fRole.value,
+        status: fStatus.value,
+        apiKey: genKey(),
+        color,
+      });
+      nextId += 1;
+      showToast('Pengguna berhasil ditambahkan.');
+    }
+    closeFormModal();
+    render();
+  });
+
+  document.getElementById('delete-cancel-btn').addEventListener('click', closeDeleteModal);
+  deleteModal.addEventListener('click', event => {
+    if (event.target === deleteModal) closeDeleteModal();
+  });
+  document.getElementById('delete-confirm-btn').addEventListener('click', () => {
+    if (!deleteTargetId) return;
+    users.splice(0, users.length, ...users.filter(user => user.id !== deleteTargetId));
+    closeDeleteModal();
+    render();
+    showToast('Pengguna berhasil dihapus.');
+  });
+
+  tbody.addEventListener('click', async event => {
+    const button = event.target.closest('button[data-action]');
+    if (!button) return;
+    const user = users.find(item => item.id === button.dataset.userId);
+    if (!user) return;
+
+    if (button.dataset.action === 'edit') {
+      openFormModal(user);
+    } else if (button.dataset.action === 'delete') {
+      deleteTargetId = user.id;
+      document.getElementById('delete-modal-desc').textContent =
+        `Pengguna "${user.name}" akan dihapus secara permanen.`;
+      deleteModal.classList.remove('hidden');
+    } else if (button.dataset.action === 'regenerate') {
+      user.apiKey = genKey();
+      render();
+      showToast('API key berhasil dibuat ulang.');
+    } else if (button.dataset.action === 'copy') {
+      try {
+        await navigator.clipboard.writeText(user.apiKey);
+        showToast('API key berhasil disalin.');
+      } catch {
+        showToast('Tidak dapat menyalin API key. Periksa izin clipboard browser.', 'danger');
+      }
+    }
+  });
+
+  document.getElementById('search-input').addEventListener('input', render);
+  document.getElementById('role-filter').addEventListener('change', render);
+  document.getElementById('status-filter').addEventListener('change', render);
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if (!deleteModal.classList.contains('hidden')) closeDeleteModal();
+    else if (!formModal.classList.contains('hidden')) closeFormModal();
+  });
+
+  render();
+}
