@@ -101,6 +101,8 @@ model User {
   isVerified     Boolean       @default(false) @map("is_verified")
   createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz
   updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  resetToken        String?   @map("reset_token") @db.VarChar(255)
+  resetTokenExpires DateTime? @map("reset_token_expires") @db.Timestamptz
 
   // Relations
   followers                    UserFollows[] @relation("Followers")
