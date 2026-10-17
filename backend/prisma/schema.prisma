@@ -1,0 +1,393 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  user
+  creator
+  merchant
+  admin
+
+  @@map("user_role")
+}
+
+enum AccountStatus {
+  active
+  suspended
+  pending_verification
+
+  @@map("account_status")
+}
+
+enum ProductStatus {
+  draft
+  active
+  archived
+  out_of_stock
+
+  @@map("product_status")
+}
+
+enum ItemCondition {
+  brand_new
+  like_new
+  good
+  fair
+
+  @@map("item_condition")
+}
+
+enum PostType {
+  image
+  carousel
+  video
+  text
+
+  @@map("post_type")
+}
+
+enum OrderStatus {
+  pending_payment
+  paid
+  processing
+  shipped
+  delivered
+  completed
+  disputed
+  cancelled
+
+  @@map("order_status")
+}
+
+enum PaymentStatus {
+  initiated
+  in_escrow
+  released_to_seller
+  refunded
+
+  @@map("payment_status")
+}
+
+enum OfferStatus {
+  pending
+  accepted
+  declined
+  expired
+
+  @@map("offer_status")
+}
+
+model User {
+  id             String        @id @default(uuid()) @db.Uuid
+  username       String        @unique @db.VarChar(32)
+  email          String        @unique @db.VarChar(255)
+  passwordHash   String        @map("password_hash") @db.VarChar(255)
+  displayName    String        @map("display_name") @db.VarChar(64)
+  bio            String?       @db.Text
+  avatarUrl      String?       @map("avatar_url") @db.Text
+  coverPhotoUrl  String?       @map("cover_photo_url") @db.Text
+  role           UserRole      @default(user)
+  status         AccountStatus @default(active)
+  isVerified     Boolean       @default(false) @map("is_verified")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  followers                    UserFollows[] @relation("Followers")
+  following                    UserFollows[] @relation("Following")
+  shop                         Shop?
+  posts                        Post[]
+  postLikes                    PostLike[]
+  postComments                 PostComment[]
+  orders                       Order[]
+  conversationsAsParticipant1  Conversation[] @relation("ParticipantOne")
+  conversationsAsParticipant2  Conversation[] @relation("ParticipantTwo")
+  messages                     Message[]
+
+  @@map("users")
+}
+
+model UserFollows {
+  followerId  String   @map("follower_id") @db.Uuid
+  followingId String   @map("following_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+  @@map("user_follows")
+}
+
+model Shop {
+  id              String   @id @default(uuid()) @db.Uuid
+  ownerId         String   @unique @map("owner_id") @db.Uuid
+  shopName        String   @map("shop_name") @db.VarChar(64)
+  slug            String   @unique @db.VarChar(64)
+  description     String?  @db.Text
+  logoUrl         String?  @map("logo_url") @db.Text
+  bannerUrl       String?  @map("banner_url") @db.Text
+  ratingAvg       Decimal? @default(5.00) @map("rating_avg") @db.Decimal(3, 2)
+  reviewCount     Int?     @default(0) @map("review_count")
+  stripeAccountId String?  @map("stripe_account_id") @db.VarChar(128)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  products Product[]
+  orders   Order[]
+
+  @@map("shops")
+}
+
+model Category {
+  id       Int        @id @default(autoincrement())
+  name     String     @db.VarChar(64)
+  slug     String     @unique @db.VarChar(64)
+  parentId Int?       @map("parent_id")
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryHierarchy")
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String        @id @default(uuid()) @db.Uuid
+  shopId      String        @map("shop_id") @db.Uuid
+  categoryId  Int?          @map("category_id")
+  title       String        @db.VarChar(160)
+  slug        String        @db.VarChar(180)
+  description String        @db.Text
+  condition   ItemCondition @default(brand_new)
+  status      ProductStatus @default(active)
+  basePrice   Decimal       @map("base_price") @db.Decimal(10, 2)
+  currency    String?       @default("USD") @db.VarChar(3)
+  hasVariants Boolean?      @default(false) @map("has_variants")
+  viewCount   Int?          @default(0) @map("view_count")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  shop          Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  category      Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images        ProductImage[]
+  variants      ProductVariant[]
+  postTags      PostProductTag[]
+  orderItems    OrderItem[]
+  conversations Conversation[]
+
+  @@index([shopId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  imageUrl  String   @map("image_url") @db.Text
+  altText   String?  @map("alt_text") @db.VarChar(160)
+  sortOrder Int?     @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductVariant {
+  id                String   @id @default(uuid()) @db.Uuid
+  productId         String   @map("product_id") @db.Uuid
+  sku               String?  @unique @db.VarChar(64)
+  variantName       String   @map("variant_name") @db.VarChar(100)
+  attributes        Json     @default("{}")
+  priceAdjustment   Decimal? @default(0.00) @map("price_adjustment") @db.Decimal(10, 2)
+  inventoryQuantity Int      @default(0) @map("inventory_quantity")
+  isActive          Boolean? @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model Post {
+  id           String   @id @default(uuid()) @db.Uuid
+  authorId     String   @map("author_id") @db.Uuid
+  caption      String?  @db.Text
+  postType     PostType @default(image) @map("post_type")
+  mediaUrls    String[] @map("media_urls") @db.Text
+  likeCount    Int?     @default(0) @map("like_count")
+  commentCount Int?     @default(0) @map("comment_count")
+  shareCount   Int?     @default(0) @map("share_count")
+  isShoppable  Boolean? @default(false) @map("is_shoppable")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  author      User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  productTags PostProductTag[]
+  likes       PostLike[]
+  comments    PostComment[]
+
+  @@index([authorId])
+  @@index([createdAt(sort: Desc)])
+  @@map("posts")
+}
+
+model PostProductTag {
+  id             String   @id @default(uuid()) @db.Uuid
+  postId         String   @map("post_id") @db.Uuid
+  productId      String   @map("product_id") @db.Uuid
+  mediaIndex     Int?     @default(0) @map("media_index")
+  xCoordinatePct Decimal? @map("x_coordinate_pct") @db.Decimal(5, 2)
+  yCoordinatePct Decimal? @map("y_coordinate_pct") @db.Decimal(5, 2)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([productId])
+  @@map("post_product_tags")
+}
+
+model PostLike {
+  postId    String   @map("post_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@map("post_likes")
+}
+
+model PostComment {
+  id              String   @id @default(uuid()) @db.Uuid
+  postId          String   @map("post_id") @db.Uuid
+  authorId        String   @map("author_id") @db.Uuid
+  parentCommentId String?  @map("parent_comment_id") @db.Uuid
+  content         String   @db.Text
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  post          Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentComment PostComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies       PostComment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@map("post_comments")
+}
+
+model Order {
+  id              String      @id @default(uuid()) @db.Uuid
+  orderNumber     String      @unique @map("order_number") @db.VarChar(32)
+  buyerId         String      @map("buyer_id") @db.Uuid
+  shopId          String      @map("shop_id") @db.Uuid
+  status          OrderStatus @default(pending_payment)
+  subtotal        Decimal     @db.Decimal(10, 2)
+  shippingFee     Decimal?    @default(0.00) @map("shipping_fee") @db.Decimal(10, 2)
+  platformFee     Decimal?    @default(0.00) @map("platform_fee") @db.Decimal(10, 2)
+  taxAmount       Decimal?    @default(0.00) @map("tax_amount") @db.Decimal(10, 2)
+  totalAmount     Decimal     @map("total_amount") @db.Decimal(10, 2)
+  shippingAddress Json        @map("shipping_address")
+  trackingNumber  String?     @map("tracking_number") @db.VarChar(128)
+  shippingCarrier String?     @map("shipping_carrier") @db.VarChar(64)
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+
+  buyer             User               @relation(fields: [buyerId], references: [id], onDelete: Restrict)
+  shop              Shop               @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  items             OrderItem[]
+  escrowTransaction EscrowTransaction?
+
+  @@index([buyerId])
+  @@index([shopId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String  @id @default(uuid()) @db.Uuid
+  orderId      String  @map("order_id") @db.Uuid
+  productId    String  @map("product_id") @db.Uuid
+  variantId    String? @map("variant_id") @db.Uuid
+  itemTitle    String  @map("item_title") @db.VarChar(160)
+  variantTitle String? @map("variant_title") @db.VarChar(100)
+  unitPrice    Decimal @map("unit_price") @db.Decimal(10, 2)
+  quantity     Int
+  totalPrice   Decimal @map("total_price") @db.Decimal(10, 2)
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@map("order_items")
+}
+
+model EscrowTransaction {
+  id                 String        @id @default(uuid()) @db.Uuid
+  orderId            String        @unique @map("order_id") @db.Uuid
+  paymentProcessorRef String       @map("payment_processor_ref") @db.VarChar(128)
+  paymentStatus      PaymentStatus @default(initiated) @map("payment_status")
+  grossAmount        Decimal       @map("gross_amount") @db.Decimal(10, 2)
+  netSellerPayout    Decimal       @map("net_seller_payout") @db.Decimal(10, 2)
+  payoutReleaseDue   DateTime?     @map("payout_release_due") @db.Timestamptz
+  releasedAt         DateTime?     @map("released_at") @db.Timestamptz
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamptz
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@map("escrow_transactions")
+}
+
+model Conversation {
+  id                  String   @id @default(uuid()) @db.Uuid
+  participantOne      String   @map("participant_one") @db.Uuid
+  participantTwo      String   @map("participant_two") @db.Uuid
+  associatedProductId String?  @map("associated_product_id") @db.Uuid
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // PERBAIKAN DI SINI: Ganti MessageUser menjadi User
+  userOne User     @relation("ParticipantOne", fields: [participantOne], references: [id], onDelete: Cascade)
+  userTwo User     @relation("ParticipantTwo", fields: [participantTwo], references: [id], onDelete: Cascade)
+  
+  product Product? @relation(fields: [associatedProductId], references: [id], onDelete: SetNull)
+  messages Message[]
+
+  @@unique([participantOne, participantTwo])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @map("conversation_id") @db.Uuid
+  senderId       String       @map("sender_id") @db.Uuid
+  body           String?      @db.Text
+  attachmentUrls String[]     @map("attachment_urls") @db.Text
+  isOffer        Boolean?     @default(false) @map("is_offer")
+  offerAmount    Decimal?     @map("offer_amount") @db.Decimal(10, 2)
+  offerStatus    OfferStatus? @map("offer_status")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@map("messages")
+}
