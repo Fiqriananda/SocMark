@@ -3,6 +3,7 @@ import { AuthService } from './auth.service.js';
 
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { MailerService } from '@nestjs-modules/mailer';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -25,6 +26,12 @@ describe('AuthService', () => {
               findUnique: vi.fn(),
               create: vi.fn(),
             },
+          },
+        },
+        {
+          provide: MailerService,
+          useValue: {
+            sendMail: vi.fn(),
           },
         },
       ],
