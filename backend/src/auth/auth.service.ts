@@ -42,7 +42,13 @@ export class AuthService {
             email: register.email,
             username: register.username,
             displayName: register.displayName,
-            passwordHash: hashedPassword
+            passwordHash: hashedPassword,
+            userRoles: {
+              create: {
+                roleId: 'REGULAR_USER',
+                status: 'ACTIVE',
+              },
+            },
         },
         select: {
             id: true,
@@ -51,6 +57,12 @@ export class AuthService {
             displayName: true,
             role: true,
             createdAt: true,
+            userRoles: {
+              select: {
+                roleId: true,
+                status: true,
+              },
+            },
         }
     })
     return { 
@@ -62,6 +74,12 @@ export class AuthService {
   async login(login:loginDTO){
     const user = await this.prisma.user.findUnique({
       where: { email: login.email },
+      include: {
+        userRoles: {
+          where: { status: 'ACTIVE' },
+          select: { roleId: true },
+        },
+      },
     });
 
     if (!user) throw new UnauthorizedException('User tidak ditemukan');
@@ -73,10 +91,15 @@ export class AuthService {
       throw new UnauthorizedException('Akun tidak aktif');
     }
 
+    const roles = user.userRoles?.map((ur) => ur.roleId) || ['REGULAR_USER'];
+    const activeRole = roles.includes('REGULAR_USER') ? 'REGULAR_USER' : roles[0] || 'REGULAR_USER';
+
     const payload = {
       sub: user.id,
       username: user.username,
       role: user.role,
+      roles: roles,
+      activeRole: activeRole,
     };
 
     return {
