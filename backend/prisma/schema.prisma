@@ -12,7 +12,7 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserRole {
+enum LegacyUserRole {
   user
   creator
   merchant
@@ -96,7 +96,7 @@ model User {
   bio            String?       @db.Text
   avatarUrl      String?       @map("avatar_url") @db.Text
   coverPhotoUrl  String?       @map("cover_photo_url") @db.Text
-  role           UserRole      @default(user)
+  role           LegacyUserRole @default(user)
   status         AccountStatus @default(active)
   isVerified     Boolean       @default(false) @map("is_verified")
   createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz
@@ -115,6 +115,10 @@ model User {
   conversationsAsParticipant1  Conversation[] @relation("ParticipantOne")
   conversationsAsParticipant2  Conversation[] @relation("ParticipantTwo")
   messages                     Message[]
+  userRoles                    UserRole[]
+  merchantKycs                 MerchantKyc[]   @relation("MerchantKycApplicant")
+  reviewedKycs                 MerchantKyc[]   @relation("MerchantKycReviewer")
+  creatorProfile               CreatorProfile?
 
   @@map("users")
 }
@@ -393,3 +397,66 @@ model Message {
   @@index([conversationId, createdAt(sort: Desc)])
   @@map("messages")
 }
+
+model Role {
+  id          String     @id @db.VarChar(50)
+  name        String     @db.VarChar(100)
+  description String?    @db.Text
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  userRoles   UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.VarChar(50)
+  status    String   @default("ACTIVE") @db.VarChar(30)
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz
+  metadata  Json     @default("{}")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model MerchantKyc {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  storeName        String    @map("store_name") @db.VarChar(150)
+  storeSlug        String    @unique @map("store_slug") @db.VarChar(150)
+  idCardNumber     String    @map("id_card_number") @db.VarChar(255)
+  taxIdNumber      String?   @map("tax_id_number") @db.VarChar(255)
+  bankAccount      Json      @map("bank_account")
+  warehouseAddress Json      @map("warehouse_address")
+  documents        Json
+  status           String    @default("PENDING") @db.VarChar(30)
+  rejectionReason  String?   @map("rejection_reason") @db.Text
+  reviewedBy       String?   @map("reviewed_by") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  user     User  @relation("MerchantKycApplicant", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User? @relation("MerchantKycReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@map("merchant_kyc")
+}
+
+model CreatorProfile {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid
+  contentNiche String[] @map("content_niche")
+  socialLinks  Json     @default("{}") @map("social_links")
+  portfolioUrl String?  @map("portfolio_url") @db.Text
+  status       String   @default("APPROVED") @db.VarChar(30)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("creator_profiles")
+}
+
