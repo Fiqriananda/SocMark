@@ -56,6 +56,7 @@ describe('ProductsService', () => {
           shopId: 'shop-1',
           categoryId: null,
           title: 'Kemeja Flanel',
+          slug: expect.stringMatching(/^kemeja-flanel-[0-9a-f]{8}$/),
           status: ProductStatus.active,
           images: { create: [{ imageUrl: 'shirt.jpg' }] },
         }),
@@ -144,5 +145,29 @@ describe('ProductsService', () => {
     productFindFirst.mockResolvedValue(null);
 
     await expect(service.findOne('missing-product')).rejects.toThrow(NotFoundException);
+  });
+
+  it('looks up product IDs as UUIDs and other identifiers as slugs', async () => {
+    productFindFirst.mockResolvedValue({ id: 'product-1', title: 'Kemeja Flanel' });
+
+    await service.findOne('8f2c4b48-5a34-4ac4-9a2f-3212c85678a1');
+    expect(productFindFirst).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        where: {
+          OR: [
+            { id: '8f2c4b48-5a34-4ac4-9a2f-3212c85678a1' },
+            { slug: '8f2c4b48-5a34-4ac4-9a2f-3212c85678a1' },
+          ],
+          status: ProductStatus.active,
+        },
+      }),
+    );
+
+    await service.findOne('kemeja-flanel');
+    expect(productFindFirst).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        where: { slug: 'kemeja-flanel', status: ProductStatus.active },
+      }),
+    );
   });
 });

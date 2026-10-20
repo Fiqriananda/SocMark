@@ -4,6 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { isUUID } from 'class-validator';
+import slugify from 'slugify';
 import { ProductStatus } from '../generated/prisma/enums.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
@@ -31,19 +33,8 @@ function serializeProduct<T extends { title: string }>(product: T) {
   return { ...product, name: product.title };
 }
 
-function slugify(value: string) {
-  return value
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value,
-  );
+function createProductSlug(name: string) {
+  return `${slugify(name, { lower: true, strict: true }) || 'product'}-${randomUUID().slice(0, 8)}`;
 }
 
 @Injectable()
@@ -64,7 +55,7 @@ export class ProductsService {
         shopId: shop.id,
         categoryId: dto.categoryId ?? null,
         title: dto.name,
-        slug: `${slugify(dto.name) || 'product'}-${randomUUID().slice(0, 8)}`,
+        slug: createProductSlug(dto.name),
         description: dto.description,
         basePrice: dto.basePrice ?? 0,
         status: dto.status ?? ProductStatus.active,
@@ -148,7 +139,7 @@ export class ProductsService {
         ...(dto.name !== undefined
           ? {
               title: dto.name,
-              slug: `${slugify(dto.name) || 'product'}-${randomUUID().slice(0, 8)}`,
+              slug: createProductSlug(dto.name),
             }
           : {}),
         ...(dto.description !== undefined ? { description: dto.description } : {}),
@@ -186,7 +177,9 @@ export class ProductsService {
   private async findProduct(idOrSlug: string, activeOnly: boolean) {
     const product = await this.prisma.product.findFirst({
       where: {
-        ...(isUuid(idOrSlug) ? { OR: [{ id: idOrSlug }, { slug: idOrSlug }] } : { slug: idOrSlug }),
+        ...(isUUID(idOrSlug)
+          ? { OR: [{ id: idOrSlug }, { slug: idOrSlug }] }
+          : { slug: idOrSlug }),
         ...(activeOnly ? { status: ProductStatus.active } : {}),
       },
       include: productIncludes,
