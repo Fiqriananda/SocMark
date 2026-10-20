@@ -18,7 +18,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
+  
   const config = new DocumentBuilder()
     .setTitle('SocMark API')
     .setDescription('The SocMark REST API documentation and interactive playground')
@@ -55,7 +55,7 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 await bootstrap();
 
