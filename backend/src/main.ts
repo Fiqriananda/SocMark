@@ -24,6 +24,8 @@ async function bootstrap() {
     .setDescription('The SocMark REST API documentation and interactive playground')
     .setVersion('1.0')
     .addTag('Authentication', 'Endpoints for user registration, authentication, and password management')
+    .addTag('Shoppable Content & Posts', 'Endpoints for shoppable video reels, feed discovery, interactive product tags, and likes')
+    .addTag('Multi-Merchant Shopping Cart', 'Zero-click cart additions with creator attribution tracking')
     .addBearerAuth(
       {
         type: 'http',
