@@ -15,22 +15,28 @@ export class CartService {
    * with creator attribution tracking.
    */
   async addItem(userId: string, dto: AddToCartDto) {
-    const product = await this.prisma.product.findUnique({
-      where: { id: dto.productId },
-      include: {
-        shop: {
-          select: {
-            id: true,
-            shopName: true,
+    let product = null;
+    try {
+      product = await this.prisma.product.findUnique({
+        where: { id: dto.productId },
+        include: {
+          shop: {
+            select: {
+              id: true,
+              shopName: true,
+            },
           },
+          variants: true,
         },
-        variants: true,
-      },
-    });
+      });
+    } catch {
+      throw new NotFoundException('Produk tidak ditemukan');
+    }
 
     if (!product) {
       throw new NotFoundException('Produk tidak ditemukan');
     }
+
 
     if (product.status !== 'active') {
       throw new BadRequestException('Produk tidak aktif dan tidak dapat dibeli');

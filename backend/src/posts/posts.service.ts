@@ -16,17 +16,22 @@ export class PostsService {
    * Only CONTENT_CREATOR or MERCHANT can execute this.
    */
   async create(userId: string, dto: CreatePostDto) {
-    // 1. Validate all tagged products are active
     if (dto.productTags && dto.productTags.length > 0) {
       for (const tag of dto.productTags) {
-        const product = await this.prisma.product.findUnique({
-          where: { id: tag.productId },
-          include: { variants: true },
-        });
+        let product = null;
+        try {
+          product = await this.prisma.product.findUnique({
+            where: { id: tag.productId },
+            include: { variants: true },
+          });
+        } catch {
+          throw new NotFoundException(`Produk dengan ID ${tag.productId} tidak ditemukan`);
+        }
 
         if (!product) {
           throw new NotFoundException(`Produk dengan ID ${tag.productId} tidak ditemukan`);
         }
+
 
         if (product.status !== 'active') {
           throw new BadRequestException(

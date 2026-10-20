@@ -16,8 +16,9 @@ export class CreateProductTagDto {
     example: '7b39a3f2-8924-4d87-b9fa-9467d532a890',
     description: 'ID of the product being tagged',
   })
-  @IsUUID()
+  @IsString()
   productId: string;
+
 
   @ApiPropertyOptional({
     example: 'sku-112233',
