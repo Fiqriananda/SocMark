@@ -1,11 +1,39 @@
+/** @format */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.alert-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+.alert-success {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   background-color: #ffffff;
   color: #111827;
   min-height: 100vh;
@@ -94,10 +122,10 @@ label {
   align-items: center;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="file"],
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='file'],
 select,
 textarea {
   width: 100%;
@@ -109,7 +137,9 @@ textarea {
   font-family: inherit;
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 input::placeholder,
@@ -158,7 +188,7 @@ textarea:focus {
   gap: 0.5rem;
 }
 
-.checkbox-group input[type="checkbox"] {
+.checkbox-group input[type='checkbox'] {
   width: 16px;
   height: 16px;
   accent-color: #111827;
@@ -324,14 +354,38 @@ textarea:focus {
   z-index: 2;
 }
 
-.node-top-left { top: 10px; left: 10px; }
-.node-top-center { top: 10px; left: 137px; }
-.node-top-right { top: 10px; right: 10px; }
-.node-mid-left { top: 137px; left: 10px; }
-.node-mid-right { top: 137px; right: 10px; }
-.node-bottom-left { bottom: 10px; left: 10px; }
-.node-bottom-center { bottom: 10px; left: 137px; }
-.node-bottom-right { bottom: 10px; right: 10px; }
+.node-top-left {
+  top: 10px;
+  left: 10px;
+}
+.node-top-center {
+  top: 10px;
+  left: 137px;
+}
+.node-top-right {
+  top: 10px;
+  right: 10px;
+}
+.node-mid-left {
+  top: 137px;
+  left: 10px;
+}
+.node-mid-right {
+  top: 137px;
+  right: 10px;
+}
+.node-bottom-left {
+  bottom: 10px;
+  left: 10px;
+}
+.node-bottom-center {
+  bottom: 10px;
+  left: 137px;
+}
+.node-bottom-right {
+  bottom: 10px;
+  right: 10px;
+}
 
 .carousel-indicators {
   display: flex;
@@ -691,7 +745,9 @@ textarea:focus {
   border: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .feed-card:hover {
@@ -748,7 +804,9 @@ textarea:focus {
   gap: 0.5rem;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .btn-locked-overlay:hover {
@@ -993,7 +1051,9 @@ textarea:focus {
   background-color: #ffffff;
   color: #111827;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .discover-search-box input:focus {
@@ -1014,7 +1074,9 @@ textarea:focus {
   justify-content: center;
   color: #6b7280;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .clear-search-btn:hover {
@@ -1099,7 +1161,10 @@ textarea:focus {
   border-radius: 9999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .tag-pill:hover {
@@ -1143,7 +1208,10 @@ textarea:focus {
   border-radius: 16px;
   background-color: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .discover-post-card:hover {
@@ -1338,7 +1406,9 @@ textarea:focus {
   border-radius: 8px;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .strip-product-chip:hover {
@@ -1431,7 +1501,9 @@ textarea:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .card-read-more-btn:hover {
@@ -1456,7 +1528,8 @@ textarea:focus {
 }
 
 @keyframes solid-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.65;
   }
   50% {
@@ -1481,9 +1554,16 @@ textarea:focus {
   margin-bottom: 0.5rem;
 }
 
-.line-long { width: 100%; }
-.line-med { width: 90%; }
-.line-short { width: 65%; margin-bottom: 1.25rem; }
+.line-long {
+  width: 100%;
+}
+.line-med {
+  width: 90%;
+}
+.line-short {
+  width: 65%;
+  margin-bottom: 1.25rem;
+}
 
 .skeleton-tags {
   height: 20px;
@@ -1566,7 +1646,9 @@ textarea:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .btn-load-more:hover {
@@ -1591,7 +1673,9 @@ textarea:focus {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 /* Modal Styles */
 .discover-modal {
@@ -1603,7 +1687,9 @@ textarea:focus {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
   padding: 1.25rem;
 }
 
@@ -1686,7 +1772,9 @@ textarea:focus {
   justify-content: center;
   color: #6b7280;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .modal-close-btn:hover {
@@ -1808,7 +1896,9 @@ textarea:focus {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .modal-product-card:hover {
@@ -1898,7 +1988,9 @@ textarea:focus {
   padding: 0.45rem 0.65rem;
   border-radius: 6px;
   text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .btn-product-feed:hover {
@@ -1986,7 +2078,9 @@ textarea:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .modal-action-btn:hover {
@@ -2025,7 +2119,9 @@ textarea:focus {
   font-weight: 500;
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
   pointer-events: auto;
   border: 1px solid #1f2937;
 }
@@ -2217,7 +2313,10 @@ textarea:focus {
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s ease;
   cursor: pointer;
 }
 
@@ -2412,7 +2511,9 @@ textarea:focus {
   font-weight: 600;
   color: #6b7280;
   cursor: pointer;
-  transition: color 0.15s ease, transform 0.12s ease;
+  transition:
+    color 0.15s ease,
+    transform 0.12s ease;
   padding: 0;
   line-height: 1;
 }
@@ -2468,8 +2569,12 @@ textarea:focus {
 }
 
 @keyframes modalOverlayFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .product-modal-card {
@@ -2568,7 +2673,9 @@ textarea:focus {
   border: 2px solid transparent;
   background-color: #ffffff;
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.12s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.12s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
@@ -2823,7 +2930,9 @@ textarea:focus {
   font-size: 0.8125rem;
   color: #111827;
   outline: none;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .modal-comment-input:focus {
@@ -2843,7 +2952,9 @@ textarea:focus {
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.12s ease;
 }
 
 .modal-comment-send:hover {
