@@ -18,43 +18,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  const config = new DocumentBuilder()
-    .setTitle('SocMark API')
-    .setDescription('The SocMark REST API documentation and interactive playground')
-    .setVersion('1.0')
-    .addTag('Authentication', 'Endpoints for user registration, authentication, and password management')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'Authorization',
-        description: 'Enter your JWT access token',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
-    customSiteTitle: 'SocMark API Docs',
-    swaggerOptions: {
-      persistAuthorization: true,
-      docExpansion: 'list',
-      filter: true,
-    },
-  });
-  SwaggerModule.setup('docs', app, document, {
-    customSiteTitle: 'SocMark API Docs',
-    swaggerOptions: {
-      persistAuthorization: true,
-      docExpansion: 'list',
-      filter: true,
-    },
-  });
-
   await app.listen(process.env.PORT ?? 3000);
 }
 await bootstrap();

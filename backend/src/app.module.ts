@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { MailerModule } from '@nestjs-modules/mailer'
 import { RbacModule } from './rbac/rbac.module.js';
+import { ProductsModule } from './products/products.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -21,6 +22,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     PrismaModule,
     AuthModule,
     RbacModule,
+    ProductsModule,
     MailerModule.forRoot({
       transport: {
         host: process.env.SMTP_HOST,

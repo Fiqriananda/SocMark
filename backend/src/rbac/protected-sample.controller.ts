@@ -20,19 +20,6 @@ export class ProtectedSampleController {
   }
 
   /**
-   * Only MERCHANT can access merchant products endpoint
-   */
-  @Post('products')
-  @Roles('MERCHANT')
-  createProduct(@CurrentUser() user: any, @ActiveRole() role: string) {
-    return {
-      message: 'Product catalog created successfully',
-      merchantId: user.id,
-      role,
-    };
-  }
-
-  /**
    * Only MERCHANT can access merchant dashboard and fulfillment
    */
   @Get('merchant/dashboard')
