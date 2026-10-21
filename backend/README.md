@@ -57,6 +57,19 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Products API
+
+Product routes are available under `/api/v1/products`. Public `GET` routes list
+active products and product details by ID or slug. Merchant `POST`, `PUT`, and
+`DELETE` routes require a bearer token and the `X-Active-Role: MERCHANT` role;
+updates and deletions are restricted to the shop owner. Deletion archives a
+product so it no longer appears in the public catalog.
+
+The API follows the current Prisma product schema: send `name` (stored as
+`title`), an integer `categoryId`, and a required `basePrice`. Images are
+stored as product images. The existing schema has no `brand`, `weight`, or
+`dimensions` fields, and category IDs are integers rather than UUIDs.
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
