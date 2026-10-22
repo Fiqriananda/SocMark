@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 interface ProfilePost {
@@ -98,9 +97,7 @@ export default function ProfilePage() {
   });
 
   return (
-    <div className="profile-page-body min-h-screen flex flex-col">
-      <Navbar />
-
+    <div className="profile-page-body flex-1 flex flex-col">
       <main className="creator-profile-container flex-1">
         {/* Profile Banner & Header Card */}
         <section className="creator-header-section" aria-label="Creator Profile Information">

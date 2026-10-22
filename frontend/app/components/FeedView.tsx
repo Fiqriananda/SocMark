@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { useCart } from "../context/CartContext";
 
 interface UserProfile {
   name: string;
@@ -70,6 +70,7 @@ interface CommentItem {
 }
 
 export default function FeedView() {
+  const { addToCart } = useCart();
   const [posts, setPosts] = useState<ProductPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -80,6 +81,7 @@ export default function FeedView() {
   const [commentsMap, setCommentsMap] = useState<Record<number, CommentItem[]>>({});
 
   const [modalPost, setModalPost] = useState<ProductPost | null>(null);
+  const [cartActionMessage, setCartActionMessage] = useState("");
   const [modalImageIndex, setModalImageIndex] = useState(0);
   const [newCommentText, setNewCommentText] = useState("");
   const commentInputRef = useRef<HTMLInputElement>(null);
@@ -179,9 +181,23 @@ export default function FeedView() {
 
   const handleOpenModal = (post: ProductPost, focusComment = false) => {
     setModalPost(post);
+    setCartActionMessage("");
     setModalImageIndex(0);
     if (focusComment) {
       setTimeout(() => commentInputRef.current?.focus(), 150);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!modalPost) return;
+    setCartActionMessage("");
+    try {
+      await addToCart();
+      setCartActionMessage(`${modalPost.title} ditambahkan ke keranjang.`);
+    } catch (error) {
+      setCartActionMessage(
+        error instanceof Error ? error.message : "Gagal menambahkan produk ke keranjang.",
+      );
     }
   };
 
@@ -224,9 +240,7 @@ export default function FeedView() {
   };
 
   return (
-    <div className="feed-page-body min-h-screen flex flex-col">
-      <Navbar />
-
+    <div className="feed-page-body flex-1 flex flex-col">
       <main className="product-page flex-1">
         <div className="product-page-heading">
           <div className="feed-header-badge">
@@ -504,6 +518,18 @@ export default function FeedView() {
 
                 <h2 className="modal-title">{modalPost.title}</h2>
                 <p className="modal-desc">{modalPost.description}</p>
+                <button
+                  type="button"
+                  className="modal-add-cart-button"
+                  onClick={handleAddToCart}
+                >
+                  Tambah ke keranjang · ${modalPost.price.toFixed(2)}
+                </button>
+                {cartActionMessage && (
+                  <p className="modal-cart-status" role="status">
+                    {cartActionMessage}
+                  </p>
+                )}
 
                 {/* Like row */}
                 <div className="modal-like-row">

@@ -4,18 +4,30 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthShowcase from "../components/AuthShowcase";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login and navigate to profile
-    router.push("/profile");
+    setError(null);
+    setSubmitting(true);
+    try {
+      await login(email, password);
+      router.push("/profile");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login gagal.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -122,8 +134,14 @@ export default function LoginPage() {
               </a>
             </div>
 
-            <button type="submit" className="btn-continue">
-              Continue
+            {error && (
+              <p role="alert" style={{ color: "#dc2626", fontSize: "0.8125rem", marginBottom: "0.75rem" }}>
+                {error}
+              </p>
+            )}
+
+            <button type="submit" className="btn-continue" disabled={submitting}>
+              {submitting ? "Signing in..." : "Continue"}
             </button>
 
             <p className="form-secondary-link">

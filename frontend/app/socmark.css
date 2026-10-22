@@ -2682,6 +2682,37 @@ textarea:focus {
   margin-bottom: 1.25rem;
 }
 
+.modal-add-cart-button {
+  width: 100%;
+  min-height: 42px;
+  margin: 0 0 0.5rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.12s ease;
+}
+
+.modal-add-cart-button:hover {
+  background: #1f2937;
+}
+
+.modal-add-cart-button:active {
+  transform: scale(0.99);
+}
+
+.modal-cart-status {
+  margin: 0 0 0.75rem;
+  color: #047857;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
 .modal-like-row {
   display: flex;
   align-items: center;
