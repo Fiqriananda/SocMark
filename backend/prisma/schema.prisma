@@ -109,6 +109,7 @@ model User {
   following                    UserFollows[] @relation("Following")
   shop                         Shop?
   posts                        Post[]
+  createdProductTags           PostProductTag[] @relation("CreatorProductTags")
   postLikes                    PostLike[]
   postComments                 PostComment[]
   orders                       Order[]
@@ -119,9 +120,12 @@ model User {
   merchantKycs                 MerchantKyc[]   @relation("MerchantKycApplicant")
   reviewedKycs                 MerchantKyc[]   @relation("MerchantKycReviewer")
   creatorProfile               CreatorProfile?
+  feedAttributionEvents        FeedAttributionEvent[]
+  cartItems                    CartItem[]
 
   @@map("users")
 }
+
 
 model UserFollows {
   followerId  String   @map("follower_id") @db.Uuid
@@ -186,13 +190,15 @@ model Product {
   createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
   updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
 
-  shop          Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  category      Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  images        ProductImage[]
-  variants      ProductVariant[]
-  postTags      PostProductTag[]
-  orderItems    OrderItem[]
-  conversations Conversation[]
+  shop              Shop                   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  category          Category?              @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images            ProductImage[]
+  variants          ProductVariant[]
+  postTags          PostProductTag[]
+  attributionEvents FeedAttributionEvent[]
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+  conversations     Conversation[]
 
   @@index([shopId])
   @@index([categoryId])
@@ -225,7 +231,9 @@ model ProductVariant {
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
-  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product    Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  postTags   PostProductTag[]
+  cartItems  CartItem[]
   orderItems OrderItem[]
 
   @@index([productId])
@@ -233,55 +241,105 @@ model ProductVariant {
 }
 
 model Post {
-  id           String   @id @default(uuid()) @db.Uuid
-  authorId     String   @map("author_id") @db.Uuid
-  caption      String?  @db.Text
-  postType     PostType @default(image) @map("post_type")
-  mediaUrls    String[] @map("media_urls") @db.Text
-  likeCount    Int?     @default(0) @map("like_count")
-  commentCount Int?     @default(0) @map("comment_count")
-  shareCount   Int?     @default(0) @map("share_count")
-  isShoppable  Boolean? @default(false) @map("is_shoppable")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  caption          String?  @db.Text
+  mediaType        String   @default("VIDEO") @map("media_type") @db.VarChar(20)
+  mediaUrl         String   @map("media_url") @db.Text
+  thumbnailUrl     String   @map("thumbnail_url") @db.Text
+  playbackMetadata Json?    @default("{\"duration\": 0, \"aspect_ratio\": \"9:16\", \"hls_resolutions\": [\"720p\", \"1080p\"]}") @map("playback_metadata")
+  status           String   @default("READY") @map("status") @db.VarChar(20)
+  likesCount       Int?     @default(0) @map("likes_count")
+  commentsCount    Int?     @default(0) @map("comments_count")
+  sharesCount      Int?     @default(0) @map("shares_count")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
-  author      User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  productTags PostProductTag[]
-  likes       PostLike[]
-  comments    PostComment[]
+  user              User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productTags       PostProductTag[]
+  likes             PostLike[]
+  comments          PostComment[]
+  attributionEvents FeedAttributionEvent[]
+  cartItems         CartItem[]
 
-  @@index([authorId])
-  @@index([createdAt(sort: Desc)])
+  @@index([userId], map: "idx_posts_user_id")
+  @@index([createdAt(sort: Desc)], map: "idx_posts_created_at")
+  @@index([status], map: "idx_posts_status")
   @@map("posts")
 }
 
 model PostProductTag {
-  id             String   @id @default(uuid()) @db.Uuid
-  postId         String   @map("post_id") @db.Uuid
-  productId      String   @map("product_id") @db.Uuid
-  mediaIndex     Int?     @default(0) @map("media_index")
-  xCoordinatePct Decimal? @map("x_coordinate_pct") @db.Decimal(5, 2)
-  yCoordinatePct Decimal? @map("y_coordinate_pct") @db.Decimal(5, 2)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id           String   @id @default(uuid()) @db.Uuid
+  postId       String   @map("post_id") @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  variantId    String?  @map("variant_id") @db.Uuid
+  creatorId    String   @map("creator_id") @db.Uuid
+  coordinateX  Decimal  @map("coordinate_x") @db.Decimal(5, 2)
+  coordinateY  Decimal  @map("coordinate_y") @db.Decimal(5, 2)
+  timeStartSec Decimal? @default(0.00) @map("time_start_sec") @db.Decimal(6, 2)
+  timeEndSec   Decimal? @map("time_end_sec") @db.Decimal(6, 2)
+  isActive     Boolean? @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  post    Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  creator User            @relation("CreatorProductTags", fields: [creatorId], references: [id], onDelete: Cascade)
 
-  @@index([postId])
-  @@index([productId])
+  @@unique([postId, productId, variantId])
+  @@index([postId], map: "idx_post_product_tags_post_id")
+  @@index([productId], map: "idx_post_product_tags_product_id")
   @@map("post_product_tags")
 }
 
 model PostLike {
-  postId    String   @map("post_id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@id([postId, userId])
+  @@id([userId, postId])
   @@map("post_likes")
+}
+
+model FeedAttributionEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  eventType String   @map("event_type") @db.VarChar(50)
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([postId, productId], map: "idx_attribution_post_product")
+  @@map("feed_attribution_events")
+}
+
+model CartItem {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  variantId    String?  @map("variant_id") @db.Uuid
+  quantity     Int      @default(1)
+  sourcePostId String?  @map("source_post_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product    Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant    ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  sourcePost Post?           @relation(fields: [sourcePostId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, productId, variantId])
+  @@index([userId], map: "idx_cart_items_user_id")
+  @@index([sourcePostId], map: "idx_cart_items_source_post")
+  @@map("cart_items")
 }
 
 model PostComment {
@@ -300,6 +358,7 @@ model PostComment {
   @@index([postId])
   @@map("post_comments")
 }
+
 
 model Order {
   id              String      @id @default(uuid()) @db.Uuid
