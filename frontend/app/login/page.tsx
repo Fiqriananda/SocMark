@@ -11,7 +11,7 @@ import { apiPost, saveToken, ApiError } from '../lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -20,9 +20,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return 'Format email tidak valid.';
-    }
+    if (!identifier.trim()) return 'Email atau username tidak boleh kosong.';
     if (!password) return 'Password tidak boleh kosong.';
     return '';
   };
@@ -40,13 +38,18 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data = await apiPost<{ accessToken: string }>('/auth/login', {
-        email,
+        email: identifier.trim(),
         password,
       });
       saveToken(data.accessToken, rememberMe);
       router.push('/profile');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Terjadi kesalahan.');
+      setError(
+        err instanceof ApiError && err.status === 401 ?
+          'Email/username atau password tidak valid.'
+        : err instanceof ApiError ? err.message
+        : 'Terjadi kesalahan.',
+      );
     } finally {
       setLoading(false);
     }
@@ -93,7 +96,7 @@ export default function LoginPage() {
             </Link>
             <div className='auth-header'>
               <h1>Welcome to SocMark</h1>
-              <p>Please enter your email and password to sign in.</p>
+              <p>Please enter your email or username and password to sign in.</p>
             </div>
           </header>
 
@@ -105,17 +108,18 @@ export default function LoginPage() {
               message={error}
             />
             <div className='form-group'>
-              <label htmlFor='email'>Email</label>
+              <label htmlFor='email'>Email or username</label>
               <input
-                type='email'
+                type='text'
                 id='email'
                 name='email'
-                value={email}
+                autoComplete='username'
+                value={identifier}
                 onChange={(e) => {
-                  setEmail(e.target.value);
+                  setIdentifier(e.target.value);
                   setError('');
                 }}
-                placeholder='grace@org.com'
+                placeholder='grace@org.com or gracehopper'
                 required
               />
             </div>
