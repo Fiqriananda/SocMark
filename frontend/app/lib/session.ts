@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   user: "socmark:user",
   activeRole: "socmark:activeRole",
   cart: "socmark:cart",
+  cartItems: "socmark:cartItems",
 } as const;
 
 export const ROLE_COOKIE = "socmark_active_role";

@@ -51,6 +51,7 @@ interface ProductPost {
   title: string;
   description: string;
   category: string;
+  brand?: string;
   price: number;
   rating: number;
   stock: number;
@@ -70,7 +71,7 @@ interface CommentItem {
 }
 
 export default function FeedView() {
-  const { addToCart } = useCart();
+  const { addCartItem } = useCart();
   const [posts, setPosts] = useState<ProductPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -192,7 +193,20 @@ export default function FeedView() {
     if (!modalPost) return;
     setCartActionMessage("");
     try {
-      await addToCart();
+      const merchantName = modalPost.brand?.trim() || `${formatCategory(modalPost.category)} Studio`;
+      addCartItem({
+        id: `product-${modalPost.id}`,
+        productId: String(modalPost.id),
+        title: modalPost.title,
+        unitPrice: modalPost.price,
+        image: modalPost.thumbnail,
+        shopId: merchantName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        shopName: merchantName,
+        officialStore: Boolean(modalPost.brand?.trim()),
+        variant: "Standard",
+        sourceCreator: modalPost._user.handle,
+        sourcePostId: modalPost.id,
+      });
       setCartActionMessage(`${modalPost.title} ditambahkan ke keranjang.`);
     } catch (error) {
       setCartActionMessage(
