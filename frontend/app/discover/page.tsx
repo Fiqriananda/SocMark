@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 interface Reaction {
@@ -279,9 +278,7 @@ export default function DiscoverPage() {
   };
 
   return (
-    <div className="profile-page-body discover-page-body min-h-screen flex flex-col">
-      <Navbar />
-
+    <div className="profile-page-body discover-page-body flex-1 flex flex-col">
       <main className="discover-container flex-1">
         {/* Hero Section */}
         <section className="discover-hero-section">
