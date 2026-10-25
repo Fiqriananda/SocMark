@@ -1,176 +1,241 @@
-"use client";
+/** @format */
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import AuthShowcase from "../components/AuthShowcase";
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthShowcase from '../components/AuthShowcase';
+import AlertBanner from '../components/AlertBanner';
+import { apiPost, ApiError } from '../lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [fullname, setFullname] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [accountType, setAccountType] = useState("");
-  const [bio, setBio] = useState("");
-  const [password, setPassword] = useState("");
-  const [termsAgree, setTermsAgree] = useState(false);
+  const [form, setForm] = useState({
+    displayName: '',
+    username: '',
+    email: '',
+    password: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError('');
+  };
+
+  const validate = () => {
+    if (form.displayName.trim().length < 3) {
+      return 'Nama lengkap minimal 3 karakter.';
+    }
+    if (form.username.trim().length < 3) {
+      return 'Username minimal 3 karakter.';
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      return 'Format email tidak valid.';
+    }
+    if (form.password.length < 8 || form.password.length > 20) {
+      return 'Password harus 8 sampai 20 karakter.';
+    }
+    return '';
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/profile");
+
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    try {
+      await apiPost('/auth/register', {
+        displayName: form.displayName.trim(),
+        username: form.username.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      });
+      setSuccess('Registrasi berhasil! Mengarahkan ke halaman login...');
+      setTimeout(() => router.push('/login'), 1500);
+    } catch (err) {
+      // 409: "Username atau Email sudah terdaftar" ikut tampil dari backend
+      setError(err instanceof ApiError ? err.message : 'Terjadi kesalahan.');
+      setLoading(false);
+    }
   };
 
   return (
-    <main className="auth-page">
-      <article className="auth-left">
-        <div className="auth-form-wrapper">
-          <header className="auth-brand-wrapper">
-            <Link href="/" className="brand-icon-box">
+    <main className='auth-page'>
+      <article className='auth-left'>
+        <div className='auth-form-wrapper'>
+          <header className='auth-brand-wrapper'>
+            <Link
+              href='/'
+              className='brand-icon-box'>
               <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="5" />
-                <circle cx="8.5" cy="9.5" r="1.5" fill="currentColor" />
-                <circle cx="15.5" cy="9.5" r="1.5" fill="currentColor" />
-                <path d="M8.5 14.5c1 1.5 2.5 2 3.5 2s2.5-.5 3.5-2" />
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'>
+                <rect
+                  width='18'
+                  height='18'
+                  x='3'
+                  y='3'
+                  rx='5'
+                />
+                <circle
+                  cx='8.5'
+                  cy='9.5'
+                  r='1.5'
+                  fill='currentColor'
+                />
+                <circle
+                  cx='15.5'
+                  cy='9.5'
+                  r='1.5'
+                  fill='currentColor'
+                />
+                <path d='M8.5 14.5c1 1.5 2.5 2 3.5 2s2.5-.5 3.5-2' />
               </svg>
             </Link>
-            <div className="auth-header">
-              <h1>Create an Account</h1>
-              <p>Join the SocMark social and marketplace network.</p>
+            <div className='auth-header'>
+              <h1>Create your account</h1>
+              <p>Join SocMark by filling in the details below.</p>
             </div>
           </header>
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="fullname">Full Name</label>
+          <form
+            onSubmit={handleSubmit}
+            noValidate>
+            <AlertBanner
+              type='error'
+              message={error}
+            />
+            <AlertBanner
+              type='success'
+              message={success}
+            />
+
+            <div className='form-group'>
+              <label htmlFor='displayName'>Full name</label>
               <input
-                type="text"
-                id="fullname"
-                name="fullname"
-                value={fullname}
-                onChange={(e) => setFullname(e.target.value)}
-                placeholder="Grace Hopper"
+                type='text'
+                id='displayName'
+                name='displayName'
+                value={form.displayName}
+                onChange={handleChange}
+                placeholder='Grace Hopper'
                 required
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="username">Username</label>
+            <div className='form-group'>
+              <label htmlFor='username'>Username</label>
               <input
-                type="text"
-                id="username"
-                name="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="grace_h"
+                type='text'
+                id='username'
+                name='username'
+                value={form.username}
+                onChange={handleChange}
+                placeholder='gracehopper'
                 required
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
+            <div className='form-group'>
+              <label htmlFor='email'>Email</label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="grace@org.com"
+                type='email'
+                id='email'
+                name='email'
+                value={form.email}
+                onChange={handleChange}
+                placeholder='grace@org.com'
                 required
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="account-type">Account Role</label>
-              <select
-                id="account-type"
-                name="account-type"
-                value={accountType}
-                onChange={(e) => setAccountType(e.target.value)}
-                required
-              >
-                <option value="" disabled>
-                  Select account role
-                </option>
-                <option value="buyer">Buyer &amp; Community Member</option>
-                <option value="seller">Merchant &amp; Store Owner</option>
-                <option value="creator">Creator &amp; Affiliate</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="bio">Bio</label>
-              <textarea
-                id="bio"
-                name="bio"
-                rows={2}
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell us about yourself or your store..."
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="avatar-file">Profile Avatar</label>
-              <input
-                type="file"
-                id="avatar-file"
-                name="avatar-file"
-                accept="image/*"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <div className="input-wrapper">
+            <div className='form-group'>
+              <label htmlFor='password'>Password</label>
+              <div className='input-wrapper'>
                 <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  id='password'
+                  name='password'
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder='8-20 characters'
                   required
                 />
+                <button
+                  type='button'
+                  className='input-icon-btn'
+                  aria-label='Toggle password visibility'
+                  onClick={() => setShowPassword(!showPassword)}>
+                  <svg
+                    width='18'
+                    height='18'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'>
+                    {showPassword ?
+                      <>
+                        <path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z' />
+                        <circle
+                          cx='12'
+                          cy='12'
+                          r='3'
+                        />
+                      </>
+                    : <>
+                        <path d='M9.88 9.88a3 3 0 1 0 4.24 4.24' />
+                        <path d='M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68' />
+                        <path d='M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61' />
+                        <line
+                          x1='2'
+                          x2='22'
+                          y1='2'
+                          y2='22'
+                        />
+                      </>
+                    }
+                  </svg>
+                </button>
               </div>
             </div>
 
-            <div className="checkbox-group">
-              <input
-                type="checkbox"
-                id="terms-agree"
-                name="terms-agree"
-                checked={termsAgree}
-                onChange={(e) => setTermsAgree(e.target.checked)}
-                required
-              />
-              <label htmlFor="terms-agree">
-                I agree to the Terms of Service and Privacy Policy
-              </label>
-            </div>
-
-            <button type="submit" className="btn-continue">
-              Create Account
+            <button
+              type='submit'
+              className='btn-continue'
+              disabled={loading}>
+              {loading ? 'Creating account...' : 'Create account'}
             </button>
 
-            <p className="form-secondary-link">
-              Already have an account? <Link href="/login">Sign in</Link>
+            <p className='form-secondary-link'>
+              Already have an account? <Link href='/login'>Sign in</Link>
             </p>
           </form>
         </div>
 
-        <footer className="auth-bottom-terms">
+        <footer className='auth-bottom-terms'>
           <p>
-            By continuing, you agree to our <a href="#">Terms of Service</a> and{" "}
-            <a href="#">Privacy Policy</a>.
+            By continuing, you agree to our <a href='#'>Terms of Service</a> and{' '}
+            <a href='#'>Privacy Policy</a>.
           </p>
         </footer>
       </article>
