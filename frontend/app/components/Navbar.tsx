@@ -9,6 +9,8 @@ export default function Navbar() {
   const isFeed = pathname === "/" || pathname === "/feed";
   const isDiscover = pathname.startsWith("/discover");
   const isProfile = pathname.startsWith("/profile");
+  const isOrders = pathname.startsWith("/orders");
+  const isChat = pathname.startsWith("/chat");
   const isLogin = pathname.startsWith("/login");
   const isRegister = pathname.startsWith("/register");
 
@@ -44,6 +46,16 @@ export default function Navbar() {
           <li>
             <Link href="/discover" className={isDiscover ? "active" : ""}>
               Discover
+            </Link>
+          </li>
+          <li>
+            <Link href="/orders" className={isOrders ? "active" : ""}>
+              Orders
+            </Link>
+          </li>
+          <li>
+            <Link href="/chat" className={isChat ? "active" : ""}>
+              Chat
             </Link>
           </li>
           <li>
