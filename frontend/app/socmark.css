@@ -4,6 +4,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
 @layer base {
   *,
   *::before,
@@ -5345,9 +5347,6 @@ textarea:focus {
     padding: 1.25rem;
   }
 
-  .modal-info {
-    padding: 1.25rem;
-    height: auto;
   .modal-info {
     padding: 1.25rem;
     height: auto;

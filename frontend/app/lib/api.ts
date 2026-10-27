@@ -20,6 +20,8 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
     headers.set("Content-Type", "application/json");
   }
   return fetch(`${API_BASE}${path}`, { ...init, headers });
+}
+
 /** @format */
 
 export const API_URL =

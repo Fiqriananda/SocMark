@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import Footer from "../../components/Footer";
 import Navbar from "../../components/Navbar";
 import { Icon } from "./ProductDetailIcons";
@@ -70,9 +70,17 @@ function formatPrice(amount: number) {
   }).format(amount);
 }
 
-export default function ProductDetailPage() {
+function ProductDetailContent() {
   const { id: productId } = useParams<{ id: string }>();
   return <ProductDetailView key={productId} productId={productId} />;
+}
+
+export default function ProductDetailPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductDetailContent />
+    </Suspense>
+  );
 }
 
 function ProductDetailView({ productId }: { productId: string }) {
