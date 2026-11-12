@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import Footer from "../../components/Footer";
-import Navbar from "../../components/Navbar";
 import { Icon } from "./ProductDetailIcons";
 import { createFallbackProduct, products } from "./productData";
 import type { Product, ProductInfoTab } from "./productTypes";
@@ -71,6 +70,14 @@ function formatPrice(amount: number) {
 }
 
 export default function ProductDetailPage() {
+  return (
+    <Suspense fallback={<main className="product-detail-page" aria-busy="true">Loading product details...</main>}>
+      <ProductDetailRoute />
+    </Suspense>
+  );
+}
+
+function ProductDetailRoute() {
   const { id: productId } = useParams<{ id: string }>();
   return <ProductDetailView key={productId} productId={productId} />;
 }
@@ -136,7 +143,6 @@ function ProductDetailView({ productId }: { productId: string }) {
 
   return (
     <div className="detail-page-shell feed-page-body min-h-screen flex flex-col">
-      <Navbar />
       <main className="product-detail-page">
         <div className="product-detail-container">
           <nav className="detail-breadcrumb" aria-label="Breadcrumb">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./context/Providers";
@@ -33,7 +34,9 @@ export default function RootLayout({
     <html lang="id" className={`${inter.variable} ${jakarta.variable}`}>
       <body className="antialiased">
         <Providers>
-          <AppShell>{children}</AppShell>
+          <Suspense fallback={<>{children}</>}>
+            <AppShell>{children}</AppShell>
+          </Suspense>
         </Providers>
       </body>
     </html>

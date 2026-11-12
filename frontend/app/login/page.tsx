@@ -203,8 +203,8 @@ export default function LoginPage() {
               </p>
             )}
 
-            <button type="submit" className="btn-continue" disabled={submitting}>
-              {submitting ? "Signing in..." : "Continue"}
+            <button type="submit" className="btn-continue" disabled={loading}>
+              {loading ? "Signing in..." : "Continue"}
             </button>
 
             <p className='form-secondary-link'>
