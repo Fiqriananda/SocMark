@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import Navbar from "../components/Navbar";
 import "./orders.css";
 
 type OrderStatus =
@@ -384,7 +383,6 @@ export default function OrdersPage() {
 
   return (
     <>
-      <Navbar />
       <main className="orders-page">
         <div className="orders-container">
           <header className="orders-header">
