@@ -240,7 +240,7 @@ model ProductVariant {
   @@map("product_variants")
 }
 
-model Post {
+C {
   id               String   @id @default(uuid()) @db.Uuid
   userId           String   @map("user_id") @db.Uuid
   caption          String?  @db.Text
