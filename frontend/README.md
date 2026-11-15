@@ -82,7 +82,8 @@ frontend/
     ├── orders/                   # Modul Riwayat Pesanan & Escrow Tracking
     │   ├── orders.css
     │   └── page.tsx
-    ├── products/
+    ├── products/                 # Modul Katalog & Detail Produk
+    │   ├── page.tsx              # Katalog produk (filter kategori, pencarian, sorting)
     │   └── [id]/                 # Modul Detail Produk (Dynamic Route)
     │       ├── ProductDetailIcons.tsx
     │       ├── page.tsx
@@ -126,19 +127,23 @@ frontend/
 ## 3. Modul yang Ada
 
 ### A. Halaman / Route (`app/`)
-| Route | Deskripsi |
-| :--- | :--- |
-| `/` & `/feed` | Community feed dengan filter kategori, masonry card produk, modal detail, like/save, dan komentar interaktif. |
-| `/discover` | Kurasi lookbook & story kreator, pencarian judul/tag, filter topik, sorting, reaksi like/dislike, bookmark, serta item shoppable. |
-| `/products/[id]` | Halaman detail produk dinamis (galeri foto, varian, info penjual, ulasan, dan tombol tambah ke keranjang/checkout). |
-| `/cart` | Halaman keranjang belanja untuk mengatur kuantitas dan item yang akan di-checkout. |
-| `/checkout` | Alur checkout pesanan dengan proteksi pembayaran escrow. |
-| `/orders` | Pelacakan status pesanan (*Pending Payment*, *In Escrow / Processing*, *Shipped*, *Completed*, *Disputed*), timeline kurir, konfirmasi pelepasan dana escrow, dan pengajuan dispute. |
-| `/chat` | Fitur pesan antara pembeli dan penjual lengkap dengan kartu konteks produk. |
-| `/profile` | Halaman profil kreator dengan cover banner, statistik, dan tab konten (*Posts*, *Goals*, *Community*, *Courses*). |
-| `/login` & `/register` | Halaman autentikasi (login dengan opsi *remember me*, registrasi dengan pilihan role Buyer/Seller/Creator). |
-| `/forgot-password` & `/reset-password` | Alur pemulihan dan pengaturan ulang kata sandi. |
-| `/admin` | Panel admin untuk manajemen user (cari, filter role/status, tambah/edit/hapus user), pengelolaan API key, dan ringkasan statistik. |
+| Route | File | Deskripsi |
+| :--- | :--- | :--- |
+| `/` | `app/page.tsx` | Halaman utama (menampilkan community feed). |
+| `/feed` | `app/feed/page.tsx` | Community feed dengan filter kategori, masonry card produk, modal detail, like/save, dan komentar interaktif. |
+| `/discover` | `app/discover/page.tsx` | Kurasi lookbook & story kreator, pencarian judul/tag, filter topik, sorting, reaksi like/dislike, bookmark, serta item shoppable. |
+| `/products` | `app/products/page.tsx` | Katalog produk marketplace dengan filter kategori, pencarian, dan sorting (*Featured*, *Price: low to high*, *Price: high to low*, *Top rated*). |
+| `/products/[id]` | `app/products/[id]/page.tsx` | Halaman detail produk dinamis (galeri foto, varian, info penjual, ulasan, dan tombol tambah ke keranjang/checkout). |
+| `/cart` | `app/cart/page.tsx` | Halaman keranjang belanja untuk mengatur kuantitas dan item yang akan di-checkout. |
+| `/checkout` | `app/checkout/page.tsx` | Alur checkout pesanan dengan proteksi pembayaran escrow. |
+| `/orders` | `app/orders/page.tsx` | Pelacakan status pesanan (*Pending Payment*, *In Escrow / Processing*, *Shipped*, *Completed*, *Disputed*), timeline kurir, konfirmasi pelepasan dana escrow, dan pengajuan dispute. |
+| `/chat` | `app/chat/page.tsx` | Fitur pesan antara pembeli dan penjual lengkap dengan kartu konteks produk. |
+| `/profile` | `app/profile/page.tsx` | Halaman profil kreator dengan cover banner, statistik, dan tab konten (*Posts*, *Goals*, *Community*, *Courses*). |
+| `/login` | `app/login/page.tsx` | Halaman login dengan email/password dan opsi *remember me*. |
+| `/register` | `app/register/page.tsx` | Halaman registrasi akun baru dengan pilihan role (*Buyer*, *Seller*, *Creator*). |
+| `/forgot-password` | `app/forgot-password/page.tsx` | Halaman permintaan reset kata sandi. |
+| `/reset-password` | `app/reset-password/page.tsx` | Halaman pengaturan ulang kata sandi. |
+| `/admin` | `app/admin/page.tsx` | Panel admin untuk manajemen user (cari, filter role/status, tambah/edit/hapus user), pengelolaan API key, dan ringkasan statistik. |
 
 ### B. Core Modules (`context/`, `components/layout/`, `lib/`)
 - **Global Context (`app/context/`)**:
@@ -164,4 +169,4 @@ Beberapa modul sudah mengambil data dari public dummy API, sedangkan modul lainn
 | **DummyJSON — Posts** | https://dummyjson.com/posts?limit=30 | `app/discover/page.tsx` (daftar story/post pada `/discover`) |
 | **Pravatar — Avatar Placeholder** | https://i.pravatar.cc/40?img=1 (variasi parameter `img`) | `app/components/FeedView.tsx` (avatar kreator & komentar) |
 | **Unsplash — Gambar Produk & Chat** | https://images.unsplash.com/ | `app/products/[id]/productData.ts`, `app/chat/mockData.ts`, `app/chat/page.tsx` (dikonfigurasi di `next.config.ts`) |
-| **In-Memory Mock Data (Lokal)** | — | `app/orders/page.tsx` (`INITIAL_ORDERS`), `app/chat/mockData.ts`, `app/products/[id]/productData.ts` |
+| **In-Memory Mock Data (Lokal)** | — | `app/orders/page.tsx` (`INITIAL_ORDERS`), `app/chat/mockData.ts`, `app/products/[id]/productData.ts` (dipakai juga di `app/products/page.tsx`) |
